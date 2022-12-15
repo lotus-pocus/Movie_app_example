@@ -2,29 +2,27 @@ var searchInput = document.querySelector(".search");
 var cardWrapper = document.querySelector("main");
 
 function noMatch() {
-  cardWrapper.innerHTML = '<p class="no-search">No results found.<p>';  
+    cardWrapper.innerHTML = '<p class="no-search">No results found.</p>';
 }
 
 
 function displayMatches(matches) {
     cardWrapper.innerHTML = '';
 
-    if (!matches.length) {
-       noMatch();
+    if (!matches) {
+        noMatch();
+    } else {
+        for (var matchObj of matches) {
+            cardWrapper.insertAdjacentHTML('beforeend', `
+          <div class="movie-card" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6),rgba(0, 0, 0, 0.6)), url(${matchObj.Poster});">
+            <h3>${matchObj.Title}</h3>
+            <p>Release Year: ${matchObj.Year}</p>
+            <a href="https://www.imdb.com/title/${matchObj.imdbID}" target="_blank">View More Info Here</a>
+          </div> 
+        `);  
+        }
     }
 
-
-    for (var matchObj of matches) {
-        cardWrapper.insertAdjacentHTML('beforeend', `
-      <div class="movie-card" style="background-image: 
-      linear-gradient(rgba(0, 0, 0, 0.6),rgba(0, 0, 0, 0.6)),  
-      url(${matchObj.movie_image})";>
-        <h3>${matchObj.title}</h3>
-        <p>${matchObj.description}</p>
-        <a href="#">${matchObj.imdb_link} target='_blank'</a>
-      </div> 
-    `)
-    }
 }
 
 
@@ -35,28 +33,30 @@ function fetchMovies(event) {
 
 
     if (keyCode === 13 && searchText) {
-        var matches = [];
 
-        for (var movieObj of movieData) {
-            if (movieObj.title.toLowerCase().includes(searchText)) {
-                matches.push(movieObj);
-            }
-        }
-        searchInput.value = '';
-        displayMatches(matches);
 
-        
-            }
+        var responsePromise = fetch(`https://www.omdbapi.com/?apikey=70ec0d2a&s=${searchText}`);
+
+        function handleResponse(responseObj) {
+            return responseObj.json();
         }
+
+        responsePromise
+            .then(handleResponse)
+            .then(function (data) {
+                displayMatches(data.Search);
+                searchInput.value = '';
+            });
+
     }
 
 }
 
-function init() {
-    searchInput.addEventListener('keydown', fetchMovies);
-}
+    function init() {
+        searchInput.addEventListener('keydown', fetchMovies);
+    }
 
-init();
+    init();
 
 
 

@@ -103,3 +103,11 @@ main .movie-card a {
     text-decoration: none;
     border-bottom: 1px dashed var(--yellow);
 }
+
+/* media queries or mobile styles */
+
+@media (max-width: 768px) {
+    main{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
